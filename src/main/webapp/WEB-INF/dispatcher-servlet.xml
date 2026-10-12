@@ -13,5 +13,7 @@
     <!-- Controllers déclarés en XML (pas de @Controller / pas de component-scan) -->
     <!-- TEMPORAIRE (CLIC-7) : à supprimer après le test -->
     <bean class="ma.youcode.clickTrack.Controller.HelloController"/>
+    
+    </bean>
 
 </beans>
