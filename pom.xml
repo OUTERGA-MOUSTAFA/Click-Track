@@ -24,6 +24,7 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
             <version>${spring.version}</version>
+            <!--  6.1.14 -->
         </dependency>
 
         <!-- JSON -->
@@ -31,12 +32,14 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
+            <!-- jackson-databind 2.17.2 -->
         </dependency>
 
         <!-- Servlet API (Jakarta, fourni par Tomcat 10.1) -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
+            <!-- jakarta.servlet-api 6.0.0 -->
             <version>6.0.0</version>
             <scope>provided</scope>
         </dependency>
@@ -46,6 +49,7 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
+            <!-- junit-jupiter 5.10.3 -->
             <scope>test</scope>
         </dependency>
     </dependencies>
