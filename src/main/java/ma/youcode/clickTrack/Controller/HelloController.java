@@ -1,4 +1,4 @@
-package ma.youcode.clickTrack.Controller;
+package ma.youcode.clickTrack.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
