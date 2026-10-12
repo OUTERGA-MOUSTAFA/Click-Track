@@ -11,4 +11,8 @@
         - le DataInitializer (init-method="init")
     -->
 
+    <bean id="Publisher" class="ma.youcode.clickTrack.repository.implimentation.ImplimentationPublisherRepository">
+    
+    <bean is="Lien" class="ma.youcode.clickTrack.repository.implimentation.ImplimentationLienRepository">
+
 </beans>
