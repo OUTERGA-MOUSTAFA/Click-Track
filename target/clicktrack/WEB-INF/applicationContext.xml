@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--
+        Ici on déclarera (stories suivantes) :
+        - les repositories (InMemory...)       -> <bean>
+        - les services (injection par <constructor-arg ref="..."/>)
+        - le DataInitializer (init-method="init")
+    -->
+
+// Publisher stock f ArrayList li f ImplimentationPublisherRepository
+    <bean id="Publisher" class="ma.youcode.clickTrack.repository.implimentation.ImplimentationPublisherRepository">
+    <bean is="Lien" class="ma.youcode.clickTrack.repository.implimentation.ImplimentationLienRepository">
+
+
+    <bean is="publisherService" class="ma.youcode.clickTrack.service.implimentation.PublisherServiceImpl">
+    <!-- <bean is="Lien" class="ma.youcode.clickTrack.repository.implimentation.ImplimentationLienRepository"> -->
+
+
+
+</beans>
