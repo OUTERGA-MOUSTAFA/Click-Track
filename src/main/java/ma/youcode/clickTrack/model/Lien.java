@@ -57,6 +57,7 @@ public class Lien {
 
     public void setPublisherId(Publisher publisherId) {
         this.publisherId = publisherId;
+        
     }
 
 }
