@@ -3,6 +3,7 @@ package ma.youcode.clickTrack.service.implimentation;
 import ma.youcode.clickTrack.dto.CreerLienRequest;
 import ma.youcode.clickTrack.dto.LienResponse;
 import ma.youcode.clickTrack.model.Lien;
+import ma.youcode.clickTrack.model.Publisher;
 import ma.youcode.clickTrack.repository.LienRepository;
 import ma.youcode.clickTrack.repository.PublisherRepository;
 import ma.youcode.clickTrack.service.LienService;
@@ -32,8 +33,7 @@ public class LienServiceImpl implements LienService {
         }
 
         //  Création : un nouveau lien démarre à 0 click, l'id est attribué par le repository
-        Lien lien = new Lien(null, lienRequest.getOffre().trim(), lienRequest.getUrlDestination().trim(), 0, publisherId);
-        // Crée le lien et l'enregistre en base
+        Lien lien = new Lien (null, lienRequest.getOffre().trim(), lienRequest.getUrlDestination().trim(), 0, publisherId);
         return versResponse(lienRepository.save(lien));
     }
 

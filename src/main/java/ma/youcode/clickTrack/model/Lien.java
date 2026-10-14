@@ -9,10 +9,10 @@ public class Lien {
     private String offre;
     private String urlDestination;
     private final AtomicInteger clicks = new AtomicInteger();
-    private Publisher publisherId;
+    private Integer publisherId;
 
     public Lien(){}
-    public Lien(Integer id, String offre, String urlDestination, int clicks, Publisher publisherId){
+    public Lien(Integer id, String offre, String urlDestination, int clicks, Integer publisherId){
         
         this.id = id;
         this.offre = offre;
@@ -33,7 +33,7 @@ public class Lien {
     public Integer getClicks() {
         return clicks.get();
     }
-    public Publisher getPublisherId() {
+    public Integer getPublisherId() {
         return publisherId;
     }
 
@@ -55,7 +55,7 @@ public class Lien {
         return clicks.incrementAndGet();
     }
 
-    public void setPublisherId(Publisher publisherId) {
+    public void setPublisherId(Integer publisherId) {
         this.publisherId = publisherId;
         
     }

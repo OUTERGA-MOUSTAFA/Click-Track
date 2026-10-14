@@ -15,4 +15,8 @@
     <bean class="ma.youcode.clickTrack.controller.PublisherController">
         <constructor-arg ref="publisherService"/>
     </bean>
+
+    <bean class="ma.youcode.clickTrack.controller.LienController">
+        <constructor-arg ref="lienService"/>
+    </bean>
 </beans>
