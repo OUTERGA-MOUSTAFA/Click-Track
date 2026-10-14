@@ -1,7 +1,13 @@
 package ma.youcode.clickTrack.service.implimentation;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import ma.youcode.clickTrack.dto.CreerLienRequest;
 import ma.youcode.clickTrack.dto.LienResponse;
+import ma.youcode.clickTrack.dto.OffreStatsResponse;
 import ma.youcode.clickTrack.model.Lien;
 import ma.youcode.clickTrack.model.Publisher;
 import ma.youcode.clickTrack.repository.LienRepository;
@@ -43,6 +49,27 @@ public class LienServiceImpl implements LienService {
  
     private LienResponse versResponse(Lien lien) {
         return new LienResponse(lien.getId(), lien.getOffre(), lien.getUrlDestination(), lien.getClicks(), lien.getPublisherId());
+    }
+
+
+    @Override 
+    public List<OffreStatsResponse> listOffres(Integer publisherId){
+
+        // check publisher if exist sinon -> 404
+        if (publisherRepository.findById(publisherId).isEmpty()) {
+            throw new IllegalArgumentException("Publisher introuvable avec l'id " + publisherId);
+        }
+
+        Map<String, List<Lien>> lienParOffre = lienRepository.findLienByPublisherId(publisherId)
+                                                            .stream()
+                                                            .collect(Collectors.groupingBy(Lien::getOffre, 
+                                                                                            LinkedHashMap::new, 
+                                                                                            Collectors.toList()));
+        return lienParOffre.entrySet().stream().map(i -> new OffreStatsResponse(i.getKey(),
+                                                                                i.getValue().size(),
+                                                                                i.getValue().stream().mapToInt(Lien::getClicks).sum())).toList();
+                                                            
+        
     }
 
 }
