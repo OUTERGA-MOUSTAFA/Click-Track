@@ -6,6 +6,11 @@ public class CreerLienRequest {
 
     public CreerLienRequest() {}//Jackson kay-créer l-objet b constructeur khawi
 
+     public CreerLienRequest(String offre, String urlDestination) {
+        this.offre = offre;
+        this.urlDestination = urlDestination;
+    }
+    
     public String getOffre() {
         return offre;
     }
