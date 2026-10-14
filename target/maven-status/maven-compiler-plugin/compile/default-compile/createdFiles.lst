@@ -11,7 +11,9 @@ ma\youcode\clickTrack\repository\LienRepository.class
 ma\youcode\clickTrack\init\DataInitializer.class
 ma\youcode\clickTrack\service\implimentation\PublisherServiceImpl.class
 ma\youcode\clickTrack\repository\implimentation\ImplimentationPublisherRepository.class
+ma\youcode\clickTrack\dto\ErreurResponse.class
 ma\youcode\clickTrack\model\Publisher.class
 ma\youcode\clickTrack\service\implimentation\LienServiceImpl.class
 ma\youcode\clickTrack\service\LienService.class
+ma\youcode\clickTrack\exception\GlobalExceptionHandler.class
 ma\youcode\clickTrack\model\Categories.class

@@ -2,7 +2,9 @@ c:\Users\LENOVO\Desktop\2 année\Briefs\Click Track\src\main\java\ma\youcode\cli
 c:\Users\LENOVO\Desktop\2 année\Briefs\Click Track\src\main\java\ma\youcode\clickTrack\controller\LienController.java
 c:\Users\LENOVO\Desktop\2 année\Briefs\Click Track\src\main\java\ma\youcode\clickTrack\controller\PublisherController.java
 c:\Users\LENOVO\Desktop\2 année\Briefs\Click Track\src\main\java\ma\youcode\clickTrack\dto\CreerLienRequest.java
+c:\Users\LENOVO\Desktop\2 année\Briefs\Click Track\src\main\java\ma\youcode\clickTrack\dto\ErreurResponse.java
 c:\Users\LENOVO\Desktop\2 année\Briefs\Click Track\src\main\java\ma\youcode\clickTrack\dto\LienResponse.java
+c:\Users\LENOVO\Desktop\2 année\Briefs\Click Track\src\main\java\ma\youcode\clickTrack\exception\GlobalExceptionHandler.java
 c:\Users\LENOVO\Desktop\2 année\Briefs\Click Track\src\main\java\ma\youcode\clickTrack\init\DataInitializer.java
 c:\Users\LENOVO\Desktop\2 année\Briefs\Click Track\src\main\java\ma\youcode\clickTrack\model\Categories.java
 c:\Users\LENOVO\Desktop\2 année\Briefs\Click Track\src\main\java\ma\youcode\clickTrack\model\Lien.java
