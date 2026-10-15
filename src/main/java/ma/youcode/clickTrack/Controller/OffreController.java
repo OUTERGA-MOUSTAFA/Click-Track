@@ -12,7 +12,7 @@ import ma.youcode.clickTrack.dto.OffreStatsResponse;
 import ma.youcode.clickTrack.service.LienService;
 
 @RestController
-@RequestMapping("/api/publishers/{id}/offres")
+@RequestMapping("/api/publishers/{publisherId}/offres")
 
 public class OffreController {
 
