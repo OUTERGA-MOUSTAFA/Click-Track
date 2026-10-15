@@ -3,11 +3,13 @@ package ma.youcode.clickTrack.service.implimentation;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import ma.youcode.clickTrack.dto.CreerLienRequest;
 import ma.youcode.clickTrack.dto.LienResponse;
 import ma.youcode.clickTrack.dto.OffreStatsResponse;
+import ma.youcode.clickTrack.dto.TrackingResponse;
 import ma.youcode.clickTrack.model.Lien;
 import ma.youcode.clickTrack.model.Publisher;
 import ma.youcode.clickTrack.repository.LienRepository;
@@ -71,5 +73,29 @@ public class LienServiceImpl implements LienService {
                                                             
         
     }
+
+
+
+    @Override 
+    public  TrackingResponse enregistrerClick(Integer lienId){
+        // Le lien doit exister sinon 404
+        Lien lien = lienRepository.findById(lienId)
+                .orElseThrow(() -> new NoSuchElementException("Lien introuvable avec l'id " + lienId));
+
+        // On récupère le publisher AVANT de compter : si quelque chose manque, aucun click n'est compté pour rien
+        Publisher publisher = publisherRepository.findById(lien.getPublisherId())
+                .orElseThrow(() -> new NoSuchElementException(
+                        "Publisher introuvable avec l'id " + lien.getPublisherId()));
+        
+
+        //  Incrémentation ATOMIQUE. On utilise la valeur RETOURNÉE par incrementerClicks()
+        //  (et pas lien.getClicks() après coup) : avec des clicks simultanés, chaque visiteur
+        //    reçoit ainsi exactement le numéro de SON click, sans doublon ni click perdu.
+        int clicks = lien.incrementerClicks();
+
+        return new TrackingResponse(lien.getUrlDestination(), publisher.getNom() +" " + publisher.getPrenom(), lien.getOffre(), clicks);
+    }
+
+
 
 }
