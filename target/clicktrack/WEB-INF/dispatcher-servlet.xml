@@ -24,4 +24,9 @@
     <bean class="ma.youcode.clickTrack.controller.OffreController">
         <constructor-arg  ref="lienService"/>
     </bean>
+
+
+    <bean class="ma.youcode.clickTrack.controller.TrackingController">
+        <constructor-arg  ref="lienService"/>
+    </bean>
 </beans>
