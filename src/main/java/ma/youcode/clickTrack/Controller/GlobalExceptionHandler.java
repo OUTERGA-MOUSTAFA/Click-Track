@@ -15,30 +15,30 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * @RestControllerAdvice = @ControllerAdvice + @ResponseBody.
  * Le bean est déclaré dans dispatcher-servlet.xml.
  */
-@RestControllerAdvice 
+@RestControllerAdvice
 public class GlobalExceptionHandler {
- 
+
     // Publisher / lien introuvable -> 404
-    @ExceptionHandler (NoSuchFieldException.class)
-    @ResponseStatus (HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoSuchElementException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, Object> handleIntrouvable(NoSuchElementException ex) {
         return erreur(404, ex.getMessage());
     }
- 
+
     // Données invalides (offre ou url vide...) -> 400
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, Object> handleRequeteInvalide(IllegalArgumentException ex) {
         return erreur(400, ex.getMessage());
     }
- 
+
     // Corps absent ou JSON mal formé -> 400
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, Object> handleCorpsIllisible(HttpMessageNotReadableException ex) {
         return erreur(400, "Corps de la requête absent ou JSON invalide");
     }
- 
+
     private Map<String, Object> erreur(int status, String message) {
         Map<String, Object> corps = new LinkedHashMap<>();
         corps.put("status", status);
@@ -46,4 +46,3 @@ public class GlobalExceptionHandler {
         return corps;
     }
 }
- 
