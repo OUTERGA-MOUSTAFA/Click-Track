@@ -14,6 +14,7 @@ public class ImplimentationPublisherRepository implements PublisherRepository{
 
 
     @Override 
+    //synchronized -> bash n Protéger l’ArrayList Lien khass tcheck
     public synchronized List<Publisher> findAll() {
         // copie : l'appelant ne touche jamais à la liste interne
         return new ArrayList<>(publishers);
