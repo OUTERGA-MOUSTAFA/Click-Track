@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Lien {
     
 
+    //AtomicInteger pour la génération des ids
     private Integer id;
     private String offre;
     private String urlDestination;
