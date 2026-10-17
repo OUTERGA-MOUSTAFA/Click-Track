@@ -8,6 +8,7 @@ import ma.youcode.clickTrack.model.Lien;
 import  ma.youcode.clickTrack.repository.LienRepository;
 public class ImplimentationLienRepository implements LienRepository {
     
+    // liste li katrja3 khass tkoun jdida kayn f model fih new
     private final List<Lien> liens = new ArrayList<>();
     private final AtomicInteger sequence = new AtomicInteger(0);
 

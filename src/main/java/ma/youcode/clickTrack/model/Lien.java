@@ -8,7 +8,7 @@ public class Lien {
     private Integer id;
     private String offre;
     private String urlDestination;
-    private final AtomicInteger clicks = new AtomicInteger();
+    private final AtomicInteger clicks = new AtomicInteger();//Protéger l’incrémentation
     private Integer publisherId;
 
     public Lien(){}
@@ -48,8 +48,8 @@ public class Lien {
         this.urlDestination = urlDestination;
     }
   
-    /** Incrémente le compteur de façon atomique et retourne la nouvelle valeur.
-    Aucun clic n'est perdu même si plusieurs visiteurs cliquent en même temps.  */
+    // Incrémente le compteur de façon atomique et retourne la nouvelle valeur.
+    // Aucun clic n'est perdu même si plusieurs visiteurs cliquent en même temps. 
      
     public int incrementerClicks() {
         return clicks.incrementAndGet();
