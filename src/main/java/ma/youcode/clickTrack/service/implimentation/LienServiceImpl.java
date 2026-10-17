@@ -98,4 +98,18 @@ public class LienServiceImpl implements LienService {
 
 
 
+    @Override
+    public List<LienResponse> listerLiens(Integer publisherId) {
+ 
+        // Le publisher doit exister sinon -> 404 (un publisher SANS lien donne simplement une liste vide)
+        if (publisherRepository.findById(publisherId).isEmpty()) {
+            throw new NoSuchElementException("Publisher introuvable avec l'id " + publisherId);
+        }
+        // Les liens du publisher, transformés en DTO (le client ne voit jamais l'entité Lien)
+        return lienRepository.findById(publisherId).stream()
+                .map(this::versResponse)
+                .toList();
+    }
+
+
 }

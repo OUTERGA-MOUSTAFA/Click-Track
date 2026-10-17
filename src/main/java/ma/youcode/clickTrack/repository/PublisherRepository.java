@@ -14,6 +14,7 @@ public interface PublisherRepository {
     List<Publisher> findAll();
 
     // Get spesifique Publisher by id
+    //                  find publisher by id
     Optional<Publisher> findById(Integer id);
 
     //  Enregistre un publisher et lui attribue un id (utilisé par DataInitializer). 
