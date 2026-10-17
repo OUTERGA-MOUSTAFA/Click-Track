@@ -14,6 +14,9 @@ public interface LienService {
     // list dyale les offers avec sum dyale clicks dyale kela lien
     List<OffreStatsResponse> listOffres (Integer publisherId);
 
+    //  Liste les liens du publisher avec leur nombre de clicks.
+     List<LienResponse> listerLiens(Integer publisherId);
+
     // Compte un click sur le lien puis retourne ses informations (url, publisher, offre, clicks).
     TrackingResponse enregistrerClick(Integer lienId);
 
