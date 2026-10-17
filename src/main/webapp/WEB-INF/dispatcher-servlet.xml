@@ -33,6 +33,6 @@
 
 
 
-//  L-handler howa li kay-9ol l Spring: NoSuchElementException → 404, IllegalArgumentException → 400.
+ <!-- L-handler howa li kay-9ol l Spring: NoSuchElementException → 404, IllegalArgumentException → 400. -->
     <bean class="ma.youcode.clickTrack.controller.GlobalExceptionHandler"/>
 </beans>

@@ -23,3 +23,4 @@ ma\youcode\clickTrack\controller\TrackingController.class
 ma\youcode\clickTrack\controller\OffreController.class
 ma\youcode\clickTrack\service\implimentation\LienServiceImpl.class
 ma\youcode\clickTrack\exception\GlobalExceptionHandler.class
+ma\youcode\clickTrack\service\implimentation\TrackingManualTest.class
