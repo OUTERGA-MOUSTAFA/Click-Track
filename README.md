@@ -1,6 +1,6 @@
 # ClickTrack
 
-🇫🇷 Français | 🇬🇧 [English](README.en.md)
+🇫🇷 Français
 
 ## 1. Présentation
 
@@ -310,3 +310,318 @@ Ce projet a été ma première vraie utilisation de **Spring Framework**, et j'y
 ## Auteur
 
 ### MOUSTAFA OUTERGA: formation YouCode, Sprint 3.
+
+
+
+# ClickTrack
+
+🇬🇧 English
+
+## 1. Overview
+
+**ClickTrack** is a REST API built with **Spring MVC** that lets *publishers* (influencers, YouTubers, bloggers) create **tracking links** to the offers they promote and **follow the number of clicks** per link and per offer.
+
+Built as part of the **YouCode** training program (Sprint 3 – Brief 1).
+
+### Business rules
+
+- A publisher creates a tracking link to a destination URL, attached to an **offer**.
+- An offer can have **several links**: its clicks are the **sum** of its links' clicks.
+- Each time a link is opened (`GET /t/{id}`), the click is counted, then the link's information is displayed.
+- **No click may be lost** when several visitors click at the same time.
+
+## 2. Technologies
+
+| Technology | Purpose |
+|---|---|
+| Java 17 | Language |
+| Maven (WAR packaging) | Build and dependencies |
+| Spring Core 6.1.14 | IoC container, dependency injection |
+| Spring MVC 6.1.14 | REST API (DispatcherServlet, controllers) |
+| Jackson 2.17.2 | JSON ↔ Java object conversion |
+| Jakarta Servlet API 6.0 | Provided by Tomcat (`provided`) |
+| Tomcat 10.1+ | Application server |
+| JUnit 5 (Jupiter) 5.10.3 | Unit tests |
+| Postman | Manual API testing |
+| In-memory storage (`ArrayList`) | No database |
+
+## 3. Architecture
+
+**Layered** architecture. Each layer depends on the **interface** of the layer below it (constructor injection).
+
+```
+Client (Postman)
+      │  HTTP / JSON
+      ▼
+Controller  ──►  Service (interface)  ──►  Repository (interface)
+ (HTTP)          (business logic)          (ArrayList storage)
+      │                 │
+     DTO              Model
+```
+
+| Layer | Role |
+|---|---|
+| **controller** | Receives the HTTP request, calls the service, returns the DTO and the HTTP status. No business logic. |
+| **service** | Business logic: checks, grouping clicks by offer, incrementing. |
+| **repository** | In-memory storage in `ArrayList`s, protected against simultaneous access. |
+| **model** | `Publisher` and `Lien` entities, `Categories` enum. |
+| **dto** | Objects exchanged with the client (`CreerLienRequest`, `LienResponse`, `OffreStatsResponse`, `TrackingResponse`). |
+| **exception** | Centralised error handling (`GlobalExceptionHandler`). |
+| **init** | `DataInitializer`: test data at startup. |
+
+### Project structure
+
+```
+clicktrack/
+├── pom.xml
+├── README.md / README.en.md
+├── .gitignore
+├── Brief/                              project brief
+└── src/
+    ├── main/
+    │   ├── java/ma/youcode/clickTrack/
+    │   │   ├── controller/             PublisherController, LienController,
+    │   │   │                           OffreController, TrackingController
+    │   │   ├── dto/
+    │   │   ├── exception/              GlobalExceptionHandler
+    │   │   ├── init/                   DataInitializer
+    │   │   ├── model/                  Publisher, Lien, Categories
+    │   │   ├── repository/             interfaces
+    │   │   │   └── implimentation/     ArrayList
+    │   │   └── service/                interfaces
+    │   │       └── implimentation/
+    │   └── webapp/WEB-INF/             web.xml, applicationContext.xml,
+    │                                   dispatcher-servlet.xml
+    └── test/java/ma/youcode/clickTrack/
+        ├── model/
+        └── service/implimentation/
+```
+
+## 4. Endpoints
+
+| Method | URL | Description | Responses |
+|---|---|---|---|
+| POST | `/api/publishers/{id}/liens` | Creates a tracking link | 201 / 400 / 404 |
+| GET | `/api/publishers` | Lists the publishers | 200 |
+| GET | `/api/publishers/{id}/liens` | Lists the links with their clicks | 200 / 404 |
+| GET | `/api/publishers/{id}/offres` | Lists the offers with their clicks | 200 / 404 |
+| GET | `/t/{id}` | Counts a click and shows the link's info | 200 / 404 |
+
+### Examples
+
+**POST `/api/publishers/1/liens`** (Body → raw → JSON)
+
+```json
+{ "offre": "Casque audio X200", "urlDestination": "https://www.exemple.com/casque-audio" }
+```
+
+Response `201 Created`:
+
+```json
+{
+  "id": 1,
+  "offre": "Casque audio X200",
+  "urlDestination": "https://www.exemple.com/casque-audio",
+  "clicks": 0,
+  "publisherId": 1
+}
+```
+
+**GET `/t/1`** → `200 OK` (the click is counted)
+
+```json
+{
+  "urlRedirection": "https://www.exemple.com/casque-audio",
+  "publisher": "Sara Alami",
+  "offre": "Casque audio X200",
+  "clicks": 1
+}
+```
+
+**GET `/api/publishers/1/offres`** → `200 OK`
+
+```json
+[
+  { "offre": "Casque audio X200", "nombreLiens": 1, "clicks": 10 },
+  { "offre": "Montre connectée Z5", "nombreLiens": 1, "clicks": 2 }
+]
+```
+
+### Error handling
+
+Services throw **standard Java exceptions**. The `GlobalExceptionHandler` (`@RestControllerAdvice`) turns them into HTTP responses:
+
+| Exception | HTTP status | Example |
+|---|---|---|
+| `NoSuchElementException` (publisher or link not found) | **404** | `GET /t/999` |
+| `IllegalArgumentException` (empty offer or URL) | **400** | `POST` with `"offre": ""` |
+| Missing body or invalid JSON | **400** | `POST` without a body |
+
+Error format:
+
+```json
+{ "status": 404, "message": "Lien introuvable avec l'id 999" }
+```
+
+## 5. Concurrency handling
+
+Several visitors can click at the same time: no click and no data may be lost.
+
+| Risk | Protection |
+|---|---|
+| Two visitors read `10` and both write `11`: a click is lost | `Lien.clicks` is an **`AtomicInteger`**; `incrementerClicks()` is atomic |
+| Two visitors get the same click number | The service uses the value **returned** by `incrementAndGet()`, not a second read |
+| Simultaneous adds to the `ArrayList` (lost elements, exceptions) | Repository methods are **`synchronized`** |
+| Reading the list while another thread modifies it (`ConcurrentModificationException`) | Repositories return a **copy** of the list |
+| Two links with the same id | Ids generated with an **`AtomicInteger`** (ids are `Integer`) |
+
+**Validation**: `ConcurrenceTest` starts 100 threads at the same time (`CountDownLatch`) and checks that the counter is exactly 100, followed by heavier tests (millions of increments, 10,000 simultaneous creations, reads during writes). I also checked that these tests **fail** when the protection is removed.
+
+> Concurrency bugs are random: 100 threads doing one click each often pass even without protection. Very dense tests are needed to expose them.
+
+## 6. Spring configuration (XML)
+
+The project is delivered with the **XML configuration**.
+
+```
+Tomcat loads the WAR
+  └─ web.xml
+       ├─ ContextLoaderListener → applicationContext.xml   (root context)
+       │     repositories, services, DataInitializer
+       └─ DispatcherServlet      → dispatcher-servlet.xml  (web context)
+             <mvc:annotation-driven/>, controllers, GlobalExceptionHandler
+```
+
+- Beans are declared with `<bean>` and `<constructor-arg ref="..."/>`; there is **no `<context:component-scan>`**.
+- The web context can see the root context's beans (controllers receive services through `ref`).
+- `@Controller` is only used as a **marker**: since Spring 6 it is required for a class to be detected as a handler. The bean is still declared in XML.
+- Mapping annotations (`@RequestMapping`, `@GetMapping`, `@PathVariable`...) are used.
+
+### The three possible configurations (only the first one is implemented)
+
+| Config | Bean declaration | Spring MVC startup |
+|---|---|---|
+| **config-xml** *(implemented)* | `<bean>` + `<constructor-arg>` in `applicationContext.xml` | `web.xml` + `dispatcher-servlet.xml` |
+| config-java | `@Bean` methods in `@Configuration` classes | `AbstractAnnotationConfigDispatcherServletInitializer` |
+| config-annotation | `@Service`, `@Repository`, `@RestController` + `@ComponentScan` | `AbstractAnnotationConfigDispatcherServletInitializer` |
+
+## 7. Installation and running
+
+**Prerequisites**: JDK 17+, Maven 3.8+, Tomcat 10.1+ (Jakarta EE).
+
+```bash
+git clone <repo-url>
+cd clicktrack
+mvn clean package          # builds target/clicktrack.war
+```
+
+1. Copy `target/clicktrack.war` into Tomcat's `webapps/` folder (or deploy it from VS Code with *Community Server Connectors*).
+2. Start Tomcat.
+3. Try: `http://localhost:8080/clicktrack/api/publishers` (adjust the port; 8081 on my machine).
+
+> Tomcat 10.1 uses the **`jakarta.*`** namespace (not `javax.*`).
+> Data is stored in memory: it is **reset on every redeployment**.
+
+## 8. Tests
+
+### Unit tests (JUnit 5)
+
+Tests live in `src/test/java` (the JUnit dependency has the `test` scope).
+
+| Test class | What it checks |
+|---|---|
+| `LienTest` | The model's click counter |
+| `LienServiceListerLiensTest` | Listing links, isolation between publishers, 404 |
+| `LienServiceOffresTest` | Grouping by offer, sum of clicks (2 links = sum) |
+| `LienServiceTrackingTest` | Click counted, link info, 404 |
+| `ConcurrenceTest` | 100 threads → 100 clicks, simultaneous creations, reads during writes |
+
+```bash
+mvn clean test                    # all tests
+mvn -Dtest=LienTest test          # a single class
+```
+
+### Postman scenarios
+
+For requests with a body: **Body → raw → JSON**.
+
+| # | Request | Expected result |
+|---|---|---|
+| 1 | `GET /api/publishers` | 200 + 3 publishers |
+| 2 | `POST /api/publishers/1/liens` (valid body) | 201 + link with 0 clicks |
+| 3 | `POST /api/publishers/999/liens` | 404 |
+| 4 | `POST` with `"offre": ""` | 400 |
+| 5 | `POST` without a body | 400 |
+| 6 | `GET /t/1` (twice) | 200, `clicks` = 1 then 2 |
+| 7 | `GET /t/999` | 404 |
+| 8 | `GET /api/publishers/1/liens` | 200, up-to-date clicks |
+| 9 | `GET /api/publishers/1/offres` | 200, sum of clicks per offer |
+| 10 | `GET /api/publishers/999/offres` | 404 |
+
+## 9. Bonus
+
+- ✅ **`DataInitializer`**: creates the 3 test publishers at startup (`init()` method declared with `init-method="init"`).
+- ⬜ **Redirection**: `GET /t/{id}` currently returns the link's info. Next step: count the click, then redirect (`302`) to `urlDestination`.
+- ⬜ **Spring ORM / Hibernate**: not done.
+
+## 10. Problems I ran into
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| `404: No endpoint GET /...` (Spring message) | Since Spring 6, `@RequestMapping` alone is no longer enough | Add `@Controller` to the controller |
+| Tomcat `404` "resource not available" on **every** URL | Malformed `applicationContext.xml`: the application did not start | Read `logs/localhost.<date>.log` (look for `SEVERE`), fix the XML |
+| `500: Required path variable 'x' is not present` | The name in `{x}` and in `@PathVariable("x")` differ | Use exactly the same name |
+| `500` instead of `404` | `GlobalExceptionHandler` not declared in `dispatcher-servlet.xml` | Declare the bean in the web context |
+| `201` expected but `500` returned | `@ResponseStatus` with no value | `@ResponseStatus(HttpStatus.CREATED)` |
+| `405 Method Not Allowed` | `GET` sent to a `POST` endpoint | Use the right HTTP method |
+| `400 Bad Request` | Missing or non-JSON body | Body → raw → **JSON** in Postman |
+| `The import org.junit cannot be resolved` / `No sources to compile` | Test placed in `src/main/java` | Move it to `src/test/java` |
+| Link list always empty | `Lien.publisherId` typed `Publisher` but compared with an `Integer` | Type `publisherId` as `Integer` |
+
+## 11. What I learned
+
+This project was my first real use of the **Spring Framework**, and I learned a lot.
+
+### Spring Core
+- **Inversion of control**: I no longer call `new` myself; Spring creates the objects (beans) and hands them to me.
+- **Constructor dependency injection**, depending on **interfaces**: cleaner code that can be tested without Spring.
+- A bean is a **singleton** by default: that is why all controllers share the same repository.
+- Bean **lifecycle**: `init-method` for `DataInitializer`.
+- **XML** configuration (`<bean>`, `<constructor-arg ref>`) and how it differs from the Java and annotation configurations.
+
+### Spring MVC
+- The path of a request: Tomcat → `web.xml` → `DispatcherServlet` → mapping → controller → JSON response.
+- **Two contexts**: root (`applicationContext.xml`) for services and web (`dispatcher-servlet.xml`) for controllers.
+- `@RequestMapping`, `@GetMapping`, `@PostMapping`, `@PathVariable`, `@RequestBody`, `@ResponseBody`, `@ResponseStatus`.
+- What changed in Spring 6 / 6.1: `@Controller` is required, explicit name in `@PathVariable("id")`.
+- **`@RestControllerAdvice`** to handle errors in one place and turn an exception into an HTTP status.
+- **Jackson** and **DTOs**: don't expose entities directly; Java 17 `record`s for short DTOs.
+
+### Java and concurrency
+- `AtomicInteger`, `synchronized`, returning **copies** of lists, `ExecutorService`, `CountDownLatch`.
+- Understanding **why** a plain counter loses clicks, and seeing it happen.
+- `Optional`, streams (`groupingBy`, `map`, `toList`), `record`s.
+
+### Testing
+- **JUnit 5**: `@Test`, `@BeforeEach`, `assertEquals`, `assertThrows`, the *Arrange / Act / Assert* pattern.
+- Tests go in `src/test/java` and must be **independent** of each other.
+- Testing concurrency is hard: it needs very intensive tests, and I need to check they really fail without the protection.
+
+### Tools and method
+- **Maven** (WAR packaging, dependency scopes), **Tomcat 10.1** (Jakarta), **Postman**.
+- **Reading Tomcat's logs** (`SEVERE`): that is where the real cause of a 404 or a 500 is.
+- Telling a **Spring 404** from a **Tomcat 404** (the application did not start).
+- **Git / Jira**: one commit per task, with the ticket key (`CLIC-12`).
+- HTTP status codes and what they mean: 200, 201, 400, 404, 405, 500.
+
+## 12. Possible improvements
+
+- `302` redirection to the destination URL in `GET /t/{id}`.
+- Replace the `ArrayList`s with a database (Spring ORM / Hibernate).
+- Validate the destination URL (`http://` or `https://` format).
+- Implement the Java and annotation configurations.
+- Add publisher authentication.
+
+## Auteur
+
+### MOUSTAFA OUTERGA:YouCode training, Sprint 3.
